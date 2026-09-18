@@ -1,0 +1,40 @@
+{
+  "model": "multinomial logistic regression",
+  "features": [
+    "mean_red",
+    "mean_green",
+    "mean_blue",
+    "std_red",
+    "std_green",
+    "std_blue",
+    "brightness",
+    "contrast",
+    "entropy"
+  ],
+  "selected_C": 100.0,
+  "selection_metric": "validation macro-F1",
+  "split_seed": 42,
+  "training_samples": 18900,
+  "validation_samples": 4050,
+  "final_fit_samples": 22950,
+  "test_samples": 4050,
+  "validation_metrics": {
+    "accuracy": 0.74,
+    "macro_f1": 0.7267021475424768,
+    "log_loss": 0.7547116835989232,
+    "multiclass_brier_score": 0.3661250479463688,
+    "expected_calibration_error": 0.016763941423928272
+  },
+  "test_metrics": {
+    "accuracy": 0.7476543209876543,
+    "macro_f1": 0.7346142817553842,
+    "log_loss": 0.7374149953338679,
+    "multiclass_brier_score": 0.3603268434120657,
+    "expected_calibration_error": 0.024566124934231395
+  },
+  "limitations": [
+    "Image-level split does not measure geographic generalization.",
+    "Handcrafted features are predictive summaries rather than causal variables.",
+    "Test results must not be used for further hyperparameter selection."
+  ]
+}

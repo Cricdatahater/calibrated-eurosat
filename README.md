@@ -1,0 +1,111 @@
+# Calibrated EuroSAT
+
+A reproducible computer-vision study on the EuroSAT RGB land-cover dataset, connecting interpretable statistical image features with transfer learning, uncertainty analysis, and model calibration.
+
+## Current results
+
+The completed statistical baseline uses nine global colour and texture features with standardized multinomial logistic regression.
+
+| Metric | Validation | Test |
+|---|---:|---:|
+| Accuracy | 0.740 | 0.748 |
+| Macro-F1 | 0.727 | 0.735 |
+| Log loss | 0.755 | 0.737 |
+| Multiclass Brier score | 0.366 | 0.360 |
+| Top-label ECE | 0.017 | 0.025 |
+
+The strongest test classes were SeaLake, Industrial, and Forest. Highway was the weakest class, followed by PermanentCrop and River. These results establish a transparent benchmark for the planned CNN experiments; they are not presented as the final model.
+
+## Dataset
+
+- **Dataset:** EuroSAT RGB
+- **Source:** official EuroSAT release by Helber et al.
+- **DOI:** [10.5281/zenodo.7711097](https://doi.org/10.5281/zenodo.7711097)
+- **Samples:** 27,000
+- **Classes:** 10
+- **Resolution:** 64 × 64 RGB
+
+The raw archive and extracted images are intentionally excluded from Git. `torchvision.datasets.EuroSAT` can download the RGB data, while the committed manifests reproduce the exact experimental partition.
+
+## Experimental protocol
+
+- Fixed stratified image-level split: 70% train, 15% validation, 15% test
+- Random seed: `42`
+- Split checksum: `f97c4ec9a27435a932662d5a8b707255`
+- Model selection uses validation macro-F1 and log loss
+- The statistical test set has been evaluated once and is now locked
+- Accuracy, macro-F1, per-class metrics, log loss, multiclass Brier score, and top-label ECE are reported
+
+The split does not incorporate geographic grouping. Results measure performance on held-out EuroSAT images and must not be interpreted as generalization to unseen geographic regions.
+
+## Repository structure
+
+```text
+.
+├── Notebooks/
+│   ├── 01_data_audit.ipynb
+│   └── 02_statistical_baseline.ipynb
+├── data/
+│   └── splits/                     # fixed indices and portable manifests
+├── reports/
+│   ├── figures/                    # EDA figures
+│   ├── data_audit.json
+│   ├── image_statistics.csv
+│   └── split_class_distribution.csv
+├── results/
+│   └── statistical_baseline/       # metrics, predictions, and figures
+├── PROJECT_HANDOVER.md
+├── requirements.txt
+└── README.md
+```
+
+## Reproduce the current analysis
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment, then install dependencies:
+
+```bash
+pip install -r requirements.txt
+jupyter lab
+```
+
+Run the notebooks in order:
+
+1. `Notebooks/01_data_audit.ipynb`
+2. `Notebooks/02_statistical_baseline.ipynb`
+
+The data-audit notebook downloads EuroSAT, verifies its structure, extracts the statistical features, checks exact duplicates, and saves the fixed splits. The statistical-baseline notebook reuses those splits without modification.
+
+## Findings from the statistical baseline
+
+- Global colour and texture summaries substantially outperform a majority-class predictor.
+- Highway remains difficult because global summaries discard road geometry and surrounding spatial context.
+- Common errors include Highway–River, Highway–Residential, and PermanentCrop–HerbaceousVegetation confusion.
+- Strong predictor correlations make individual logistic-regression coefficients unstable; coefficients are predictive associations rather than causal feature effects.
+- Spatial representations learned by a CNN are expected to address limitations of the handcrafted features.
+
+## Planned work
+
+- [x] Data audit and reproducible split
+- [x] Handcrafted statistical baseline
+- [ ] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
+- [ ] Fine-tuned ResNet18
+- [ ] Calibration and temperature scaling
+- [ ] Paired bootstrap confidence intervals and McNemar comparison
+- [ ] Qualitative failure-case analysis
+- [ ] Final research report and portfolio polish
+
+## Reproducibility notes
+
+- The raw dataset, trained checkpoints, and local environments are ignored by Git.
+- Generated metrics, predictions, selected figures, and split manifests are committed.
+- The project initially used Python 3.12, NumPy 1.26, pandas 2.2, scikit-learn 1.5, and a CPU PyTorch environment.
+- GPU experiments should record the exact PyTorch, Torchvision, CUDA, GPU, pretrained-weight, transform, seed, and checkpoint configuration.
+
+## Citation
+
+If you use EuroSAT, cite the original dataset publication and official release. Dataset provenance and project decisions are recorded in `PROJECT_HANDOVER.md`.
+
