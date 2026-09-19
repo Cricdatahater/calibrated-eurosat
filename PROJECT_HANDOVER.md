@@ -54,7 +54,7 @@ Final statistical-baseline performance:
 | Validation | 0.740 | 0.727 | 0.755 | 0.366 | 0.017 |
 | Test | 0.748 | 0.735 | 0.737 | 0.360 | 0.025 |
 
-### In progress: Stage 3 — frozen ResNet18 embeddings
+### Completed: Stage 3 — frozen ResNet18 embeddings
 
 - Enabled a Kaggle GPU environment and loaded the official EuroSAT RGB data.
 - Reused the fixed split manifests and generated 512-dimensional embeddings
@@ -64,6 +64,10 @@ Final statistical-baseline performance:
 - Selected and froze `C = 0.01` using the declared primary criterion of
   validation macro-F1.
 - Kept the test partition locked during model selection.
+- Refit the selected pipeline on the combined training and validation
+  embeddings and evaluated the test partition once.
+- Saved the Kaggle notebook, validation search, test classification report,
+  confusion matrix, experiment summary, and baseline comparison.
 
 Frozen ResNet18 validation selection:
 
@@ -76,9 +80,17 @@ Frozen ResNet18 validation selection:
 | 10 | 0.916 | 0.913 | 0.852 | 0.151 | 0.072 |
 | 100 | 0.916 | 0.913 | 1.397 | 0.158 | 0.077 |
 
-These are validation results, not final test results. The original Kaggle CSV
-and notebook still need to be downloaded and committed; the repository copy of
-the table was transcribed from the supplied Kaggle screenshot.
+Final frozen-ResNet18 performance:
+
+| Partition | Accuracy | Macro-F1 | Log loss | Multiclass Brier | ECE |
+|---|---:|---:|---:|---:|---:|
+| Validation | 0.939 | 0.937 | 0.183 | 0.091 | 0.019 |
+| Test | 0.949 | 0.947 | 0.160 | 0.079 | 0.021 |
+
+Relative to the handcrafted baseline, test accuracy improved by 20.2 percentage
+points and macro-F1 by 21.2 percentage points. PermanentCrop, River, and Highway
+remain the weakest frozen-CNN classes by F1; SeaLake, Residential, and
+Industrial are strongest.
 
 ## Verified dataset facts
 
@@ -169,6 +181,7 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 - Notebooks:
   - `Notebooks/01_data_audit.ipynb`
   - `Notebooks/02_statistical_baseline.ipynb`
+  - `Notebooks/03_frozen_resnet18_embeddings.ipynb`
 - Machine-readable audit: `reports/data_audit.json`
 - Image-level feature table: `reports/image_statistics.csv`
 - Duplicate report: `reports/duplicate_report.csv`
@@ -179,20 +192,23 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 - Frozen ResNet18 validation search and audit: `results/frozen_resnet18/`
 - Fitted statistical pipeline (local, Git-ignored): `models/statistical_logistic_regression.joblib`
 
-## Current milestone: complete Stage 3 — frozen CNN embeddings
+## Next milestone: Stage 4 — fine-tuned ResNet18
 
-Download and commit `Notebooks/03_frozen_resnet18_embeddings.ipynb` from Kaggle. Complete the locked test evaluation using the already selected `C = 0.01`; do not perform further model selection after viewing test metrics.
+Create `Notebooks/04_finetuned_resnet18.ipynb` on the GPU platform. Initialize from the same `IMAGENET1K_V1` checkpoint, preserve the fixed manifests, and tune the training procedure using validation data only.
 
 ### Required workflow
 
-1. Load the three saved split manifests; do not create a new split.
-2. Use the preprocessing transforms associated with the selected pretrained ResNet18 weights.
-3. Freeze all CNN parameters and extract one embedding per image without gradient tracking.
-4. Cache embeddings with dataset indices, labels, weight identifier, and preprocessing metadata.
-5. Fit any scaler and the linear classifier using training embeddings only.
-6. Select classifier regularization using validation macro-F1 and log loss.
-7. Keep the test partition locked until the representation and classifier settings are frozen.
-8. Save metrics, predictions, confusion matrices, calibration outputs, and experiment metadata.
+1. Load the saved split manifests without modification.
+2. Use training-only stochastic augmentation and deterministic validation/test
+   preprocessing; document both transform pipelines.
+3. Start from `ResNet18_Weights.IMAGENET1K_V1` and replace the classification
+   head for the 10 EuroSAT classes.
+4. Choose the head-only warm-up, unfreezing policy, learning rates, optimizer,
+   scheduler, regularization, and early-stopping rule using validation data only.
+5. Save the best validation checkpoint and its complete training history.
+6. Freeze the full configuration before the single test evaluation.
+7. Save per-class metrics, probabilities, confusion matrix, calibration outputs,
+   environment metadata, and experiment configuration.
 
 ### Metrics
 
@@ -206,19 +222,18 @@ Download and commit `Notebooks/03_frozen_resnet18_embeddings.ipynb` from Kaggle.
 
 ### Comparison goals
 
-- Compare the frozen-CNN classifier directly with the handcrafted-feature baseline on the same split.
-- Check whether visually ambiguous class pairs improve.
+- Compare the fine-tuned model directly with both completed baselines on the same split.
+- Check whether PermanentCrop, River, and Highway improve.
 - Report both classification quality and probability quality.
 - Keep the image-level/geographic-generalization limitation explicit.
 
 ## Planned later stages
 
-1. Fine-tuned ImageNet-pretrained ResNet18.
-2. Calibration analysis and temperature scaling.
-3. Paired comparison using bootstrap confidence intervals and McNemar's test.
-4. Qualitative failure-case analysis.
-5. Final README and portfolio presentation.
+1. Calibration analysis and temperature scaling.
+2. Paired comparison using bootstrap confidence intervals and McNemar's test.
+3. Qualitative failure-case analysis.
+4. Final README and portfolio presentation.
 
 ## Immediate next action
 
-Verify the Kaggle notebook controls, fit the `C = 0.01` pipeline on training plus validation embeddings, evaluate the locked test set once, and save all Stage 3 artifacts.
+Design the validation-only fine-tuning protocol before starting Stage 4 training; the completed Stage 3 test result is now locked and must not guide Stage 4 hyperparameter selection.

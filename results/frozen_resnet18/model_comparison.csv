@@ -1,0 +1,6 @@
+metric,handcrafted_features,frozen_resnet18,difference_resnet_minus_handcrafted
+accuracy,0.747654,0.949383,0.201728
+macro_f1,0.734614,0.947055,0.212441
+log_loss,0.737415,0.159799,-0.577616
+multiclass_brier_score,0.360327,0.078636,-0.281691
+expected_calibration_error,0.024566,0.020928,-0.003638

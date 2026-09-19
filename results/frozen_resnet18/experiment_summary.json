@@ -1,0 +1,42 @@
+{
+  "representation": "ImageNet-pretrained frozen ResNet18",
+  "embedding_dimension": 512,
+  "pretrained_weights": "IMAGENET1K_V1",
+  "classifier": "standardized multinomial logistic regression",
+  "selected_C": 0.01,
+  "selection_rule": "Highest validation macro-F1, then lower log loss, then smaller C",
+  "split_seed": 42,
+  "split_checksum": "f97c4ec9a27435a932662d5a8b707255",
+  "training_samples": 18900,
+  "validation_samples": 4050,
+  "final_fit_samples": 22950,
+  "test_samples": 4050,
+  "validation_metrics": {
+    "accuracy": 0.939012,
+    "macro_f1": 0.936953,
+    "log_loss": 0.182669,
+    "multiclass_brier_score": 0.091367,
+    "expected_calibration_error": 0.018778
+  },
+  "test_evaluated_once": true,
+  "test_metrics": {
+    "accuracy": 0.949383,
+    "macro_f1": 0.947055,
+    "log_loss": 0.159799,
+    "multiclass_brier_score": 0.078636,
+    "expected_calibration_error": 0.020928
+  },
+  "environment": {
+    "python": "3.12.13",
+    "pytorch": "2.10.0+cu128",
+    "torchvision": "0.25.0+cu128",
+    "cuda": "12.8",
+    "gpu": "Tesla T4"
+  },
+  "limitations": [
+    "The image-level split does not measure geographic generalization.",
+    "The test set was evaluated once after model selection.",
+    "The CNN was frozen and was not fine-tuned on EuroSAT.",
+    "Validation ECE shares the validation data used for model selection."
+  ]
+}

@@ -16,12 +16,22 @@ The completed statistical baseline uses nine global colour and texture features 
 
 The strongest test classes were SeaLake, Industrial, and Forest. Highway was the weakest class, followed by PermanentCrop and River. These results establish a transparent benchmark for the planned CNN experiments; they are not presented as the final model.
 
-The frozen ResNet18 stage has completed validation model selection. A
-standardized linear classifier with `C = 0.01` achieved validation accuracy
-`0.939`, macro-F1 `0.937`, log loss `0.183`, multiclass Brier score `0.091`, and
-top-label ECE `0.019`. This configuration is frozen, but its test result has not
-yet been recorded; the test partition remains locked until the Kaggle notebook
-and pipeline checks are complete.
+The frozen ResNet18 stage is complete. An ImageNet-pretrained ResNet18 produced
+512-dimensional embeddings, followed by a standardized linear classifier with
+validation-selected `C = 0.01`.
+
+| Metric | Validation | Test |
+|---|---:|---:|
+| Accuracy | 0.939 | 0.949 |
+| Macro-F1 | 0.937 | 0.947 |
+| Log loss | 0.183 | 0.160 |
+| Multiclass Brier score | 0.091 | 0.079 |
+| Top-label ECE | 0.019 | 0.021 |
+
+Compared with the handcrafted baseline, the frozen representation improved test
+accuracy by 20.2 percentage points and macro-F1 by 21.2 percentage points. The
+test partition was evaluated once after the representation and classifier were
+frozen.
 
 ## Dataset
 
@@ -51,7 +61,8 @@ The split does not incorporate geographic grouping. Results measure performance 
 .
 ├── Notebooks/
 │   ├── 01_data_audit.ipynb
-│   └── 02_statistical_baseline.ipynb
+│   ├── 02_statistical_baseline.ipynb
+│   └── 03_frozen_resnet18_embeddings.ipynb
 ├── data/
 │   └── splits/                     # fixed indices and portable manifests
 ├── reports/
@@ -84,6 +95,7 @@ Run the notebooks in order:
 
 1. `Notebooks/01_data_audit.ipynb`
 2. `Notebooks/02_statistical_baseline.ipynb`
+3. `Notebooks/03_frozen_resnet18_embeddings.ipynb` in a GPU-enabled Kaggle environment
 
 The data-audit notebook downloads EuroSAT, verifies its structure, extracts the statistical features, checks exact duplicates, and saves the fixed splits. The statistical-baseline notebook reuses those splits without modification.
 
@@ -95,13 +107,19 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - Strong predictor correlations make individual logistic-regression coefficients unstable; coefficients are predictive associations rather than causal feature effects.
 - Spatial representations learned by a CNN are expected to address limitations of the handcrafted features.
 
+## Findings from the frozen ResNet18 baseline
+
+- Frozen ImageNet features substantially outperform global colour and texture summaries on every classification and probabilistic metric.
+- SeaLake, Residential, and Industrial have the strongest test F1 scores.
+- PermanentCrop, River, and Highway remain the weakest classes, though each is substantially stronger than under the handcrafted baseline.
+- High classification accuracy does not remove the need for a separate calibration protocol; top-label ECE improved only modestly.
+- The representation remains frozen, so these results do not measure the benefit of end-to-end EuroSAT fine-tuning.
+
 ## Planned work
 
 - [x] Data audit and reproducible split
 - [x] Handcrafted statistical baseline
-- [ ] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
-  - [x] Validation model selection (`C = 0.01`)
-  - [ ] Locked test evaluation and complete artifact export
+- [x] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
 - [ ] Fine-tuned ResNet18
 - [ ] Calibration and temperature scaling
 - [ ] Paired bootstrap confidence intervals and McNemar comparison
@@ -113,7 +131,8 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - The raw dataset, trained checkpoints, and local environments are ignored by Git.
 - Generated metrics, predictions, selected figures, and split manifests are committed.
 - The project initially used Python 3.12, NumPy 1.26, pandas 2.2, scikit-learn 1.5, and a CPU PyTorch environment.
-- GPU experiments should record the exact PyTorch, Torchvision, CUDA, GPU, pretrained-weight, transform, seed, and checkpoint configuration.
+- The frozen ResNet18 experiment used Python 3.12.13, PyTorch 2.10.0+cu128, Torchvision 0.25.0+cu128, CUDA 12.8, a Tesla T4, and the explicitly pinned `IMAGENET1K_V1` checkpoint.
+- GPU experiments record the exact PyTorch, Torchvision, CUDA, GPU, pretrained-weight, transform, seed, and checkpoint configuration.
 
 ## Citation
 
