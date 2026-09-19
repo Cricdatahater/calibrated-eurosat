@@ -16,6 +16,13 @@ The completed statistical baseline uses nine global colour and texture features 
 
 The strongest test classes were SeaLake, Industrial, and Forest. Highway was the weakest class, followed by PermanentCrop and River. These results establish a transparent benchmark for the planned CNN experiments; they are not presented as the final model.
 
+The frozen ResNet18 stage has completed validation model selection. A
+standardized linear classifier with `C = 0.01` achieved validation accuracy
+`0.939`, macro-F1 `0.937`, log loss `0.183`, multiclass Brier score `0.091`, and
+top-label ECE `0.019`. This configuration is frozen, but its test result has not
+yet been recorded; the test partition remains locked until the Kaggle notebook
+and pipeline checks are complete.
+
 ## Dataset
 
 - **Dataset:** EuroSAT RGB
@@ -53,7 +60,8 @@ The split does not incorporate geographic grouping. Results measure performance 
 │   ├── image_statistics.csv
 │   └── split_class_distribution.csv
 ├── results/
-│   └── statistical_baseline/       # metrics, predictions, and figures
+│   ├── statistical_baseline/       # metrics, predictions, and figures
+│   └── frozen_resnet18/             # validation search and methodology audit
 ├── PROJECT_HANDOVER.md
 ├── requirements.txt
 └── README.md
@@ -92,6 +100,8 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - [x] Data audit and reproducible split
 - [x] Handcrafted statistical baseline
 - [ ] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
+  - [x] Validation model selection (`C = 0.01`)
+  - [ ] Locked test evaluation and complete artifact export
 - [ ] Fine-tuned ResNet18
 - [ ] Calibration and temperature scaling
 - [ ] Paired bootstrap confidence intervals and McNemar comparison
@@ -108,4 +118,3 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 ## Citation
 
 If you use EuroSAT, cite the original dataset publication and official release. Dataset provenance and project decisions are recorded in `PROJECT_HANDOVER.md`.
-

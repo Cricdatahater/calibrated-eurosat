@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 18 September 2026
+Last updated: 19 September 2026
 
 ## Objective
 
@@ -53,6 +53,32 @@ Final statistical-baseline performance:
 |---|---:|---:|---:|---:|---:|
 | Validation | 0.740 | 0.727 | 0.755 | 0.366 | 0.017 |
 | Test | 0.748 | 0.735 | 0.737 | 0.360 | 0.025 |
+
+### In progress: Stage 3 — frozen ResNet18 embeddings
+
+- Enabled a Kaggle GPU environment and loaded the official EuroSAT RGB data.
+- Reused the fixed split manifests and generated 512-dimensional embeddings
+  from an ImageNet-pretrained frozen ResNet18.
+- Searched six logistic-regression regularization values using the training and
+  validation partitions only.
+- Selected and froze `C = 0.01` using the declared primary criterion of
+  validation macro-F1.
+- Kept the test partition locked during model selection.
+
+Frozen ResNet18 validation selection:
+
+| C | Accuracy | Macro-F1 | Log loss | Multiclass Brier | ECE |
+|---:|---:|---:|---:|---:|---:|
+| **0.01** | **0.939** | **0.937** | **0.183** | **0.091** | **0.019** |
+| 0.001 | 0.933 | 0.931 | 0.258 | 0.117 | 0.080 |
+| 0.1 | 0.931 | 0.928 | 0.212 | 0.103 | 0.023 |
+| 1 | 0.920 | 0.917 | 0.394 | 0.131 | 0.055 |
+| 10 | 0.916 | 0.913 | 0.852 | 0.151 | 0.072 |
+| 100 | 0.916 | 0.913 | 1.397 | 0.158 | 0.077 |
+
+These are validation results, not final test results. The original Kaggle CSV
+and notebook still need to be downloaded and committed; the repository copy of
+the table was transcribed from the supplied Kaggle screenshot.
 
 ## Verified dataset facts
 
@@ -150,11 +176,12 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 - Figures: `reports/figures/`
 - Fixed split definitions: `data/splits/`
 - Statistical results: `results/statistical_baseline/`
+- Frozen ResNet18 validation search and audit: `results/frozen_resnet18/`
 - Fitted statistical pipeline (local, Git-ignored): `models/statistical_logistic_regression.joblib`
 
-## Next milestone: Stage 3 — frozen CNN embeddings
+## Current milestone: complete Stage 3 — frozen CNN embeddings
 
-Create `Notebooks/03_frozen_resnet18_embeddings.ipynb`. Use an ImageNet-pretrained ResNet18 as a fixed feature extractor and train a linear classifier on its embeddings.
+Download and commit `Notebooks/03_frozen_resnet18_embeddings.ipynb` from Kaggle. Complete the locked test evaluation using the already selected `C = 0.01`; do not perform further model selection after viewing test metrics.
 
 ### Required workflow
 
@@ -194,4 +221,4 @@ Create `Notebooks/03_frozen_resnet18_embeddings.ipynb`. Use an ImageNet-pretrain
 
 ## Immediate next action
 
-Confirm GPU access, then build the frozen ResNet18 embedding baseline using the existing split manifests.
+Verify the Kaggle notebook controls, fit the `C = 0.01` pipeline on training plus validation embeddings, evaluate the locked test set once, and save all Stage 3 artifacts.
