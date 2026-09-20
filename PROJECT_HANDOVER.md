@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 19 September 2026
+Last updated: 20 September 2026
 
 ## Objective
 
@@ -182,6 +182,7 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
   - `Notebooks/01_data_audit.ipynb`
   - `Notebooks/02_statistical_baseline.ipynb`
   - `Notebooks/03_frozen_resnet18_embeddings.ipynb`
+  - `Notebooks/04_finetuned_resnet18.ipynb`
 - Machine-readable audit: `reports/data_audit.json`
 - Image-level feature table: `reports/image_statistics.csv`
 - Duplicate report: `reports/duplicate_report.csv`
@@ -190,11 +191,63 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 - Fixed split definitions: `data/splits/`
 - Statistical results: `results/statistical_baseline/`
 - Frozen ResNet18 validation search and audit: `results/frozen_resnet18/`
+- Fine-tuned ResNet18 histories, predictions, metrics, and figures:
+  `results/fine_tuned_resnet18/`
 - Fitted statistical pipeline (local, Git-ignored): `models/statistical_logistic_regression.joblib`
+- Fine-tuned neural checkpoints (local, Git-ignored):
+  `models/fine_tuned_resnet18/`
 
-## Next milestone: Stage 4 — fine-tuned ResNet18
+## Completed: Stage 4 — fine-tuned ResNet18
 
-Create `Notebooks/04_finetuned_resnet18.ipynb` on the GPU platform. Initialize from the same `IMAGENET1K_V1` checkpoint, preserve the fixed manifests, and tune the training procedure using validation data only.
+The cleaned archival notebook is `Notebooks/04_finetuned_resnet18.ipynb`.
+It initializes from `IMAGENET1K_V1`, preserves the fixed manifests, compares
+two registered fine-tuning candidates using validation data only, and evaluates
+the selected checkpoint once on test.
+
+### Stage 4 registration status — 20 September 2026
+
+- The complete pre-training protocol is recorded in `STAGE4_PROTOCOL.md`.
+- Stage 4 training and its locked test evaluation are complete.
+- The Kaggle notebook `04-finetuned-resnet18.ipynb` has been created and its
+  setup/data-pipeline cells have run successfully on a Tesla T4 GPU.
+- The saved split was verified at 18,900/4,050/4,050 samples with checksum
+  `f97c4ec9a27435a932662d5a8b707255`; all 27,000 manifest paths were present.
+- The train, validation, and test loaders passed a 64-image smoke test with
+  tensor shape `[64, 3, 224, 224]` and labels in the expected 10-class range.
+- The registered three-epoch head-only warm-up completed successfully. Only
+  `fc.weight` and `fc.bias` (5,130 parameters) were trainable.
+- Warm-up validation macro-F1 improved from `0.910109` to `0.925971`; validation
+  log loss improved from `0.289788` to `0.219391`. Epoch 3 is the selected
+  shared warm-up checkpoint for both fine-tuning candidates.
+- Candidate A (`layer4` + head) completed all 12 epochs. Its selected epoch is
+  12 with validation macro-F1 `0.977565` and log loss `0.088523`.
+- Candidate B (full fine-tuning) stopped after epoch 11 with patience 4. Its
+  selected epoch is 7 with validation macro-F1 `0.977003` and log loss
+  `0.074390`.
+- Candidate A is the locked Stage 4 selection because the predeclared primary
+  criterion is higher validation macro-F1. Candidate B's lower log loss is only
+  a tie-breaker and the macro-F1 values are not tied.
+- Candidate A was frozen before test evaluation with checkpoint SHA-256
+  `3f6a701aca082fa675ba229ddfbae0139346e3cbff84ea02ff0617ab73c5d657`.
+- The one-time Stage 4 test evaluation is complete: accuracy `0.979506`,
+  macro-F1 `0.978540`, log loss `0.074072`, multiclass Brier score `0.033437`,
+  and 15-bin top-label ECE `0.012213`.
+- Local audit of the downloaded notebook confirmed that model selection was
+  frozen before the test loop and that the test set was evaluated once.
+- The downloaded notebook was cleaned and renamed to
+  `Notebooks/04_finetuned_resnet18.ipynb`. The saved diagnostic error and
+  duplicate recovery cells were removed, verified Candidate A/B histories were
+  consolidated into the archival record, and explanatory Markdown was added.
+- The registered project protocol compares partial (`layer4` + head) and full
+  fine-tuning after a shared three-epoch head warm-up.
+- Candidate selection is validation-only; the known Stage 3 test result must not
+  influence any Stage 4 choice.
+- The proposed recipe is a project-specific controlled extension until the
+  target research paper and its published fine-tuning settings are audited.
+- The complete Kaggle artifact ZIP passed CRC and numerical consistency checks.
+  Checkpoints are stored locally under the Git-ignored `models/` directory;
+  reproducible metrics, histories, predictions, summaries, and vector figures
+  are stored under `results/fine_tuned_resnet18/`.
 
 ### Required workflow
 
@@ -236,4 +289,7 @@ Create `Notebooks/04_finetuned_resnet18.ipynb` on the GPU platform. Initialize f
 
 ## Immediate next action
 
-Design the validation-only fine-tuning protocol before starting Stage 4 training; the completed Stage 3 test result is now locked and must not guide Stage 4 hyperparameter selection.
+Review and commit the completed Stage 4 notebook, protocol, metrics, predictions,
+and figures. Then begin the separate calibration stage: fit temperature scaling
+on validation logits only, freeze the temperature, and evaluate calibrated
+probabilities without changing the Stage 4 classifier or its reported result.

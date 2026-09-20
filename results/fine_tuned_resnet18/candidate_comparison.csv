@@ -1,0 +1,3 @@
+candidate,trainable_parameters,best_epoch,validation_macro_f1,validation_log_loss,selected
+candidate_a,layer4 and fc,12,0.977565113695982,0.0885230745751517,True
+candidate_b,full network,7,0.97700273761596,0.07439034946798424,False

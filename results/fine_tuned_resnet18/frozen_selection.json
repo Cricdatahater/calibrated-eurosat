@@ -1,0 +1,10 @@
+{
+  "selected_candidate": "candidate_a",
+  "selected_epoch": 12,
+  "selection_metric": "validation_macro_f1",
+  "validation_macro_f1": 0.977565113695982,
+  "validation_log_loss": 0.0885230745751517,
+  "checkpoint_sha256": "3f6a701aca082fa675ba229ddfbae0139346e3cbff84ea02ff0617ab73c5d657",
+  "split_checksum": "f97c4ec9a27435a932662d5a8b707255",
+  "seed": 42
+}

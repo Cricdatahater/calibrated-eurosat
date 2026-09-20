@@ -1,0 +1,12 @@
+{
+  "python": "3.12.13",
+  "pytorch": "2.10.0+cu128",
+  "torchvision": "0.25.0+cu128",
+  "scikit_learn": "1.6.1",
+  "cuda": "12.8",
+  "gpu": "Tesla T4",
+  "platform": "Kaggle",
+  "pretrained_weights": "ResNet18_Weights.IMAGENET1K_V1",
+  "seed": 42,
+  "split_checksum": "f97c4ec9a27435a932662d5a8b707255"
+}

@@ -1,0 +1,17 @@
+{
+  "candidate_a_best.pth": {
+    "bytes": 112013424,
+    "sha256": "3f6a701aca082fa675ba229ddfbae0139346e3cbff84ea02ff0617ab73c5d657",
+    "git_ignored": true
+  },
+  "candidate_b_best.pth": {
+    "bytes": 134314913,
+    "sha256": "6f8ef53414981980db53eefc0bfa9d4adeab15bff48443344244c88400586061",
+    "git_ignored": true
+  },
+  "head_warmup_best.pth": {
+    "bytes": 44807307,
+    "sha256": "b674f10ef146c518c6a61cc620e87a64fa41d39ce5a8879769d3d45cfe6fa4ef",
+    "git_ignored": true
+  }
+}
