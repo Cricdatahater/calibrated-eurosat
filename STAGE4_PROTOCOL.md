@@ -1,7 +1,7 @@
 # Stage 4 Registered Protocol — Fine-tuned ResNet18
 
 Protocol registered: 20 September 2026  
-Status: completed and locally audited; Git push pending  
+Status: completed, locally audited, and committed
 Canonical progress record: `PROJECT_HANDOVER.md`
 
 ## Research question
@@ -214,10 +214,9 @@ documented calibration run without altering the locked Stage 4 result.
 - [x] Test evaluated once (accuracy `0.979506`, macro-F1 `0.978540`, log loss
   `0.074072`, Brier `0.033437`, 15-bin ECE `0.012213`).
 - [x] Required artifacts downloaded to the project and numerically verified.
-- [ ] Cleaned notebook and reproducible non-checkpoint artifacts pushed to GitHub.
+- [x] Cleaned notebook and reproducible non-checkpoint artifacts pushed to GitHub.
 
 ## Current restart point
 
-Review and commit the cleaned notebook, protocol, histories, predictions,
-metrics, summaries, and vector figures. Checkpoints remain local and Git-ignored.
-Then begin the separate validation-only temperature-scaling stage.
+Stage 4 is archived. Stage 5 validation-only temperature scaling is complete;
+see `STAGE5_PROTOCOL.md`. Checkpoints remain local and Git-ignored.

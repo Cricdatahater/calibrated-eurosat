@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 20 September 2026
+Last updated: 21 September 2026
 
 ## Objective
 
@@ -183,6 +183,7 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
   - `Notebooks/02_statistical_baseline.ipynb`
   - `Notebooks/03_frozen_resnet18_embeddings.ipynb`
   - `Notebooks/04_finetuned_resnet18.ipynb`
+  - `Notebooks/05_temperature_scaling.ipynb`
 - Machine-readable audit: `reports/data_audit.json`
 - Image-level feature table: `reports/image_statistics.csv`
 - Duplicate report: `reports/duplicate_report.csv`
@@ -193,9 +194,64 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 - Frozen ResNet18 validation search and audit: `results/frozen_resnet18/`
 - Fine-tuned ResNet18 histories, predictions, metrics, and figures:
   `results/fine_tuned_resnet18/`
+- Temperature-scaling logits, metrics, predictions, bootstrap intervals, and
+  figures: `results/temperature_scaling/`
 - Fitted statistical pipeline (local, Git-ignored): `models/statistical_logistic_regression.joblib`
 - Fine-tuned neural checkpoints (local, Git-ignored):
   `models/fine_tuned_resnet18/`
+
+## Completed: Stage 5 — temperature scaling
+
+Stage 5 calibrates the locked Stage 4 Candidate A checkpoint without retraining
+or changing the classifier. The complete method and audit record are in
+`STAGE5_PROTOCOL.md`; the archival notebook is
+`Notebooks/05_temperature_scaling.ipynb`.
+
+### Locked inputs and method
+
+- Checkpoint SHA-256:
+  `3f6a701aca082fa675ba229ddfbae0139346e3cbff84ea02ff0617ab73c5d657`.
+- Split checksum: `f97c4ec9a27435a932662d5a8b707255`.
+- Deterministic `IMAGENET1K_V1` evaluation transforms were retained.
+- Batch size 64 and CUDA mixed-precision inference reproduce the Stage 4 path.
+- One positive scalar temperature was fitted by minimizing validation-only
+  multiclass negative log-likelihood.
+- The fitted temperature `1.8226799937` was frozen before test metrics were
+  calculated.
+- All 4,050 validation and 4,050 test observations have saved logits and unique
+  dataset indices.
+
+### Stage 5 results
+
+| Partition | Calibration | Accuracy | Macro-F1 | Log loss | Brier | ECE |
+|---|---|---:|---:|---:|---:|---:|
+| Validation | Before | 0.978519 | 0.977565 | 0.088523 | 0.036730 | 0.013305 |
+| Validation | After | 0.978519 | 0.977565 | 0.069421 | 0.035502 | 0.005596 |
+| Test | Before | 0.979506 | 0.978540 | 0.074072 | 0.033437 | 0.012213 |
+| Test | After | 0.979506 | 0.978540 | 0.060098 | 0.031412 | 0.002788 |
+
+The positive temperature preserves class ordering; every test prediction is
+unchanged. Paired 2,000-resample bootstrap differences (`calibrated -
+uncalibrated`) were:
+
+- log loss: `-0.013974`, 95% interval `[-0.022496, -0.006348]`;
+- multiclass Brier score: `-0.002026`, 95% interval
+  `[-0.003563, -0.000492]`;
+- 15-bin ECE: `-0.009425`, 95% interval `[-0.011544, -0.003110]`.
+
+All intervals exclude zero on the fixed image-level test set. They do not
+establish calibration under geographic or other distribution shift.
+
+### Stage 5 audit status — 21 September 2026
+
+- The saved Kaggle version completed successfully on a Tesla T4.
+- The checkpoint and split checksums match the locked records.
+- The uncalibrated test accuracy and macro-F1 reproduce Stage 4 exactly.
+- The downloaded artifact ZIP passed extraction and numerical consistency
+  checks.
+- The test prediction table has 4,050 unique rows, 27 columns, and no missing
+  values.
+- Trained checkpoints remain local and Git-ignored.
 
 ## Completed: Stage 4 — fine-tuned ResNet18
 
@@ -282,14 +338,15 @@ the selected checkpoint once on test.
 
 ## Planned later stages
 
-1. Calibration analysis and temperature scaling.
-2. Paired comparison using bootstrap confidence intervals and McNemar's test.
-3. Qualitative failure-case analysis.
-4. Final README and portfolio presentation.
+1. Paired model comparison using bootstrap confidence intervals and McNemar's
+   test.
+2. Qualitative failure-case analysis.
+3. Final research report and portfolio presentation.
 
 ## Immediate next action
 
-Review and commit the completed Stage 4 notebook, protocol, metrics, predictions,
-and figures. Then begin the separate calibration stage: fit temperature scaling
-on validation logits only, freeze the temperature, and evaluate calibrated
-probabilities without changing the Stage 4 classifier or its reported result.
+Begin the paired model-comparison stage using the existing per-observation
+predictions. Compare the handcrafted, frozen ResNet18, and fine-tuned ResNet18
+models with paired bootstrap confidence intervals and McNemar's test. Keep the
+test set locked against further model or calibration tuning, then proceed to
+qualitative failure-case analysis.

@@ -52,6 +52,24 @@ checkpoint has SHA-256
 
 ![Stage 4 training curves](results/fine_tuned_resnet18/figures/training_curves.svg)
 
+Stage 5 fitted one scalar temperature using validation logits from the locked
+Stage 4 checkpoint. The temperature was frozen at `1.822680` before calibrated
+test metrics were calculated. Classification predictions are unchanged.
+
+| Test metric | Before calibration | After calibration | Change |
+|---|---:|---:|---:|
+| Accuracy | 0.979506 | 0.979506 | 0.000000 |
+| Macro-F1 | 0.978540 | 0.978540 | 0.000000 |
+| Log loss | 0.074072 | **0.060098** | -0.013974 |
+| Multiclass Brier score | 0.033437 | **0.031412** | -0.002026 |
+| Top-label ECE | 0.012213 | **0.002788** | -0.009425 |
+
+Paired 2,000-resample bootstrap intervals for the three probability-metric
+changes exclude zero. These intervals quantify uncertainty on the fixed
+image-level test set and do not establish calibration under geographic shift.
+
+![Stage 5 reliability and confidence](results/temperature_scaling/figures/reliability_and_confidence.svg)
+
 ## Dataset
 
 - **Dataset:** EuroSAT RGB
@@ -84,7 +102,8 @@ The split does not incorporate geographic grouping. Results measure performance 
 │   ├── 01_data_audit.ipynb
 │   ├── 02_statistical_baseline.ipynb
 │   ├── 03_frozen_resnet18_embeddings.ipynb
-│   └── 04_finetuned_resnet18.ipynb
+│   ├── 04_finetuned_resnet18.ipynb
+│   └── 05_temperature_scaling.ipynb
 ├── data/
 │   └── splits/                     # fixed indices and portable manifests
 ├── reports/
@@ -95,9 +114,11 @@ The split does not incorporate geographic grouping. Results measure performance 
 ├── results/
 │   ├── statistical_baseline/       # metrics, predictions, and figures
 │   ├── frozen_resnet18/             # validation search and methodology audit
-│   └── fine_tuned_resnet18/         # histories, predictions, metrics, figures
+│   ├── fine_tuned_resnet18/         # histories, predictions, metrics, figures
+│   └── temperature_scaling/         # logits, calibration metrics, predictions
 ├── PROJECT_HANDOVER.md
 ├── STAGE4_PROTOCOL.md
+├── STAGE5_PROTOCOL.md
 ├── requirements.txt
 └── README.md
 ```
@@ -121,6 +142,8 @@ Run the notebooks in order:
 2. `Notebooks/02_statistical_baseline.ipynb`
 3. `Notebooks/03_frozen_resnet18_embeddings.ipynb` in a GPU-enabled Kaggle environment
 4. `Notebooks/04_finetuned_resnet18.ipynb` in a GPU-enabled Kaggle environment
+5. `Notebooks/05_temperature_scaling.ipynb` in Kaggle with the locked Stage 4
+   checkpoint attached as a private input
 
 The data-audit notebook downloads EuroSAT, verifies its structure, extracts the statistical features, checks exact duplicates, and saves the fixed splits. The statistical-baseline notebook reuses those splits without modification.
 
@@ -156,13 +179,26 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 
 ![Stage 4 test confusion matrix](results/fine_tuned_resnet18/figures/test_confusion_matrix.svg)
 
+## Findings from temperature scaling
+
+- Validation-only temperature scaling selected `T = 1.822680`, indicating that
+  the locked model's probabilities were moderately overconfident.
+- Test log loss fell from `0.074072` to `0.060098`, Brier score from `0.033437`
+  to `0.031412`, and 15-bin ECE from `0.012213` to `0.002788`.
+- Paired bootstrap intervals for all three changes exclude zero on the fixed
+  test set.
+- Every predicted class is unchanged, so accuracy and macro-F1 remain the
+  locked Stage 4 values.
+- The result measures in-domain calibration on an image-level split, not
+  calibration on unseen geographic regions or under distribution shift.
+
 ## Planned work
 
 - [x] Data audit and reproducible split
 - [x] Handcrafted statistical baseline
 - [x] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
 - [x] Fine-tuned ResNet18
-- [ ] Calibration and temperature scaling
+- [x] Calibration and temperature scaling
 - [ ] Paired bootstrap confidence intervals and McNemar comparison
 - [ ] Qualitative failure-case analysis
 - [ ] Final research report and portfolio polish
@@ -176,6 +212,9 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - The fine-tuned ResNet18 experiment used the same Kaggle runtime and pinned
   pretrained weights; its complete pre-training decision record is in
   `STAGE4_PROTOCOL.md`.
+- The temperature-scaling run used the locked Stage 4 checkpoint, matching
+  mixed-precision inference settings, and is documented in
+  `STAGE5_PROTOCOL.md`.
 - GPU experiments record the exact PyTorch, Torchvision, CUDA, GPU, pretrained-weight, transform, seed, and checkpoint configuration.
 
 ## Citation
