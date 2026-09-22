@@ -1,0 +1,10 @@
+{
+  "bootstrap_resamples": 2000,
+  "random_seed": 42,
+  "bootstrap_unit": "test image",
+  "confidence_interval": "95% percentile interval",
+  "difference_order": "second model minus first model",
+  "mcnemar_test": "two-sided exact binomial",
+  "test_samples": 4050,
+  "split_checksum": "f97c4ec9a27435a932662d5a8b707255"
+}

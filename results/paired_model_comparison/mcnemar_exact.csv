@@ -1,0 +1,4 @@
+comparison,first_only_correct,second_only_correct,discordant,mcnemar_exact_p
+frozen vs handcrafted,80,897,977,1.3415899074043245e-175
+fine_tuned vs handcrafted,42,981,1023,1.831635298638351e-233
+fine_tuned vs frozen,30,152,182,7.703865523887063e-21

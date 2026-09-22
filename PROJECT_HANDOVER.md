@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 21 September 2026
+Last updated: 22 September 2026
 
 ## Objective
 
@@ -336,17 +336,43 @@ the selected checkpoint once on test.
 - Report both classification quality and probability quality.
 - Keep the image-level/geographic-generalization limitation explicit.
 
+## Completed: Stage 6 — paired model comparison
+
+The archival notebook is `Notebooks/06_paired_model_comparison.ipynb`.
+It aligns the three models' saved predictions by `dataset_index` against the
+locked 4,050-image test manifest. The frozen-model prediction CSV from the
+original Kaggle run is now at `results/frozen_resnet18/test_predictions.csv`.
+The reproducible result tables and method record are under
+`results/paired_model_comparison/`.
+
+- The fine-tuned ResNet18 has the best uncalibrated test accuracy (`0.979506`),
+  macro-F1 (`0.978540`), log loss (`0.074072`), and multiclass Brier score
+  (`0.033437`) among the three registered models.
+- Against frozen ResNet18, its paired accuracy difference is `+0.030123`
+  (2,000-resample bootstrap 95% interval `[0.023704, 0.036790]`); its
+  macro-F1 difference is `+0.031485` (`[0.024878, 0.038559]`).
+- Its log-loss difference from frozen ResNet18 is `-0.085727`
+  (`[-0.102065, -0.068015]`), and its Brier difference is `-0.045199`
+  (`[-0.053137, -0.037320]`).
+- On discordant test images, only frozen ResNet18 is correct 30 times and only
+  fine-tuned ResNet18 is correct 152 times. The two-sided exact McNemar
+  p-value is `7.70e-21`.
+- The comparison uses the original uncalibrated Stage 4 predictions; Stage 5
+  temperature scaling is evaluated separately and does not change class
+  predictions.
+- The intervals treat images as independent. The fixed image-level split does
+  not establish performance in unseen geographic regions, and no test result
+  should be used for further model or calibration tuning.
+
 ## Planned later stages
 
-1. Paired model comparison using bootstrap confidence intervals and McNemar's
-   test.
-2. Qualitative failure-case analysis.
-3. Final research report and portfolio presentation.
+1. Qualitative failure-case analysis.
+2. Final research report and portfolio presentation.
 
 ## Immediate next action
 
-Begin the paired model-comparison stage using the existing per-observation
-predictions. Compare the handcrafted, frozen ResNet18, and fine-tuned ResNet18
-models with paired bootstrap confidence intervals and McNemar's test. Keep the
-test set locked against further model or calibration tuning, then proceed to
-qualitative failure-case analysis.
+Begin qualitative failure-case analysis using the locked test predictions.
+Inspect representative errors and model disagreements, especially for
+PermanentCrop, River, and Highway. Group recurring visual confusions, document
+specific image examples and limitations, and use the analysis for the final
+report without retuning models on test data.

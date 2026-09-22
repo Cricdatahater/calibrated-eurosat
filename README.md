@@ -192,6 +192,20 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - The result measures in-domain calibration on an image-level split, not
   calibration on unseen geographic regions or under distribution shift.
 
+## Paired model comparison
+
+The three saved test-prediction files are aligned by dataset index in
+`Notebooks/06_paired_model_comparison.ipynb`. Its outputs are in
+`results/paired_model_comparison/`. On the same 4,050 test images, fine-tuned
+ResNet18 improves accuracy over frozen ResNet18 by 3.01 percentage points
+(paired bootstrap 95% interval 2.37–3.68 points) and macro-F1 by 3.15 points
+(interval 2.49–3.86 points). It also has lower log loss and Brier score. Among
+182 images on which only one of the two is correct, fine-tuned ResNet18 is
+correct on 152 and frozen ResNet18 on 30 (two-sided exact McNemar
+`p = 7.70e-21`). This comparison uses the uncalibrated fine-tuned predictions;
+Stage 5 reports calibration separately. The image-level split does not measure
+generalization to unseen geographic regions.
+
 ## Planned work
 
 - [x] Data audit and reproducible split
@@ -199,7 +213,7 @@ The data-audit notebook downloads EuroSAT, verifies its structure, extracts the 
 - [x] Frozen ImageNet-pretrained ResNet18 embeddings with a linear classifier
 - [x] Fine-tuned ResNet18
 - [x] Calibration and temperature scaling
-- [ ] Paired bootstrap confidence intervals and McNemar comparison
+- [x] Paired bootstrap confidence intervals and McNemar comparison
 - [ ] Qualitative failure-case analysis
 - [ ] Final research report and portfolio polish
 
