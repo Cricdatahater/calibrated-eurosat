@@ -206,6 +206,32 @@ correct on 152 and frozen ResNet18 on 30 (two-sided exact McNemar
 Stage 5 reports calibration separately. The image-level split does not measure
 generalization to unseen geographic regions.
 
+## Qualitative failure-case analysis
+
+`Notebooks/07_failure_case_analysis.ipynb` reviews the locked test predictions
+without retraining or selecting a model. The complete error tables, 18-case
+human observation log, and selected image galleries are stored in
+`results/qualitative_failure_analysis/`.
+
+- The fine-tuned ResNet18 makes 83 errors on 4,050 test images. The largest
+  class error counts are PermanentCrop (21 of 375), Pasture (16 of 300),
+  HerbaceousVegetation (13 of 450), and River (11 of 375).
+- Its most frequent error pairs are PermanentCrop → AnnualCrop (11), Pasture →
+  AnnualCrop (7), PermanentCrop → HerbaceousVegetation (6), and River → Highway
+  (5). Forest and SeaLake have no errors on this fixed test split.
+- Fine-tuning corrects 152 errors made by frozen ResNet18 and introduces 30
+  errors on images the frozen model classified correctly. Both models are
+  wrong on 53 images.
+- The 18 displayed cases are deliberately selected: six priority-class cases,
+  six high-confidence fine-tuned errors, and six high-confidence corrections.
+  They illustrate possible crop-pattern, linear-feature, and built-environment
+  ambiguities but do not estimate how common those visual causes are.
+- Human image notes are interpretations of 64 × 64 RGB patches. They do not
+  establish why a model made a prediction, justify relabelling observations,
+  or demonstrate geographic generalization.
+
+![Selected Stage 7 cases](results/qualitative_failure_analysis/starter_cases.png)
+
 ## Planned work
 
 - [x] Data audit and reproducible split
@@ -214,7 +240,7 @@ generalization to unseen geographic regions.
 - [x] Fine-tuned ResNet18
 - [x] Calibration and temperature scaling
 - [x] Paired bootstrap confidence intervals and McNemar comparison
-- [ ] Qualitative failure-case analysis
+- [x] Qualitative failure-case analysis
 - [ ] Final research report and portfolio polish
 
 ## Reproducibility notes

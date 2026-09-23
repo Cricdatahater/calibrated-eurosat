@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 22 September 2026
+Last updated: 23 September 2026
 
 ## Objective
 
@@ -364,15 +364,50 @@ The reproducible result tables and method record are under
   not establish performance in unseen geographic regions, and no test result
   should be used for further model or calibration tuning.
 
+## Completed: Stage 7 — qualitative failure-case analysis
+
+The archival notebook is `Notebooks/07_failure_case_analysis.ipynb`. It joins
+the handcrafted, frozen ResNet18, and fine-tuned ResNet18 predictions to the
+locked test manifest by `dataset_index`, then reviews aggregate error counts and
+selected original image patches. Outputs are stored under
+`results/qualitative_failure_analysis/`.
+
+### Recorded findings
+
+- Fine-tuned ResNet18 makes 83 errors on the 4,050-image test split.
+- The largest class error counts are PermanentCrop (21/375), Pasture (16/300),
+  HerbaceousVegetation (13/450), and River (11/375). Highway has 8/375 errors;
+  Forest and SeaLake have none on this fixed split.
+- The most frequent fine-tuned confusion pairs are PermanentCrop → AnnualCrop
+  (11), Pasture → AnnualCrop (7), PermanentCrop → HerbaceousVegetation (6),
+  Pasture → Forest (5), River → Highway (5), and HerbaceousVegetation → Pasture
+  (5).
+- Relative to frozen ResNet18, fine-tuning corrects 152 errors, introduces 30
+  errors, and leaves both models wrong on 53 images.
+- The review set contains 18 deliberately selected cases: six preselected
+  PermanentCrop/River/Highway examples, six of the remaining highest-confidence
+  fine-tuned errors, and six of the remaining highest-confidence corrections.
+- The completed `case_notes.csv` records visible features, possible reasons for
+  confusion, apparent image or label ambiguity, and confidence in each human
+  interpretation.
+
+### Interpretation limits
+
+The selected cases are not a random sample and cannot estimate the prevalence
+of a visual failure mechanism. Notes about field geometry, narrow linear
+features, vegetation, or built-up patterns are hypotheses based on 64 × 64 RGB
+patches; they do not reveal a model's causal decision process and must not be
+used to relabel the data or tune a model on the test set. The image-level split
+still does not establish generalization to unseen geographic regions.
+
 ## Planned later stages
 
-1. Qualitative failure-case analysis.
-2. Final research report and portfolio presentation.
+1. Final research report and portfolio presentation.
 
 ## Immediate next action
 
-Begin qualitative failure-case analysis using the locked test predictions.
-Inspect representative errors and model disagreements, especially for
-PermanentCrop, River, and Highway. Group recurring visual confusions, document
-specific image examples and limitations, and use the analysis for the final
-report without retuning models on test data.
+Prepare the final research report and portfolio presentation. Consolidate the
+fixed experimental protocol, model progression, paired comparisons,
+calibration results, qualitative examples, reproducibility instructions, and
+geographic-generalization limitation. Perform editorial and artifact checks;
+do not introduce new model selection or tune against the locked test set.
