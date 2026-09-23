@@ -29,3 +29,4 @@ env/
 .DS_Store
 Thumbs.db
 
+results/frozen_resnet18/test_predictions.txt
