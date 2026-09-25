@@ -2,6 +2,8 @@
 
 A reproducible computer-vision study on the EuroSAT RGB land-cover dataset, connecting interpretable statistical image features with transfer learning, uncertainty analysis, and model calibration.
 
+**Project status:** complete. Read the consolidated [final report](FINAL_REPORT.md), or use this README as the portfolio summary.
+
 ## Current results
 
 The completed statistical baseline uses nine global colour and texture features with standardized multinomial logistic regression.
@@ -14,7 +16,7 @@ The completed statistical baseline uses nine global colour and texture features 
 | Multiclass Brier score | 0.366 | 0.360 |
 | Top-label ECE | 0.017 | 0.025 |
 
-The strongest test classes were SeaLake, Industrial, and Forest. Highway was the weakest class, followed by PermanentCrop and River. These results establish a transparent benchmark for the planned CNN experiments; they are not presented as the final model.
+The strongest test classes were SeaLake, Industrial, and Forest. Highway was the weakest class, followed by PermanentCrop and River. These results establish a transparent benchmark for the subsequent CNN experiments; they are not presented as the final model.
 
 The frozen ResNet18 stage is complete. An ImageNet-pretrained ResNet18 produced
 512-dimensional embeddings, followed by a standardized linear classifier with
@@ -103,19 +105,20 @@ The split does not incorporate geographic grouping. Results measure performance 
 │   ├── 02_statistical_baseline.ipynb
 │   ├── 03_frozen_resnet18_embeddings.ipynb
 │   ├── 04_finetuned_resnet18.ipynb
-│   └── 05_temperature_scaling.ipynb
+│   ├── 05_temperature_scaling.ipynb
+│   ├── 06_paired_model_comparison.ipynb
+│   └── 07_failure_case_analysis.ipynb
 ├── data/
 │   └── splits/                     # fixed indices and portable manifests
-├── reports/
-│   ├── figures/                    # EDA figures
-│   ├── data_audit.json
-│   ├── image_statistics.csv
-│   └── split_class_distribution.csv
+├── reports/                        # audit tables and EDA figures
 ├── results/
 │   ├── statistical_baseline/       # metrics, predictions, and figures
-│   ├── frozen_resnet18/             # validation search and methodology audit
-│   ├── fine_tuned_resnet18/         # histories, predictions, metrics, figures
-│   └── temperature_scaling/         # logits, calibration metrics, predictions
+│   ├── frozen_resnet18/            # validation search and predictions
+│   ├── fine_tuned_resnet18/        # histories, predictions, metrics, figures
+│   ├── temperature_scaling/        # logits, calibration metrics, predictions
+│   ├── paired_model_comparison/    # paired intervals and McNemar test
+│   └── qualitative_failure_analysis/ # error tables, notes, and galleries
+├── FINAL_REPORT.md
 ├── PROJECT_HANDOVER.md
 ├── STAGE4_PROTOCOL.md
 ├── STAGE5_PROTOCOL.md
@@ -144,8 +147,16 @@ Run the notebooks in order:
 4. `Notebooks/04_finetuned_resnet18.ipynb` in a GPU-enabled Kaggle environment
 5. `Notebooks/05_temperature_scaling.ipynb` in Kaggle with the locked Stage 4
    checkpoint attached as a private input
+6. `Notebooks/06_paired_model_comparison.ipynb` locally from the committed
+   prediction CSVs
+7. `Notebooks/07_failure_case_analysis.ipynb` locally with the extracted RGB
+   images available under `data/raw/`
 
-The data-audit notebook downloads EuroSAT, verifies its structure, extracts the statistical features, checks exact duplicates, and saves the fixed splits. The statistical-baseline notebook reuses those splits without modification.
+The data-audit notebook downloads EuroSAT, verifies its structure, extracts the
+statistical features, checks exact duplicates, and saves the fixed splits.
+Later CPU notebooks reuse committed predictions and manifests. The large GPU
+stages remain reproducible from their notebooks and protocol records, although
+trained checkpoints are intentionally excluded from Git.
 
 ## Findings from the statistical baseline
 
@@ -232,7 +243,7 @@ human observation log, and selected image galleries are stored in
 
 ![Selected Stage 7 cases](results/qualitative_failure_analysis/starter_cases.png)
 
-## Planned work
+## Project completion checklist
 
 - [x] Data audit and reproducible split
 - [x] Handcrafted statistical baseline
@@ -241,7 +252,7 @@ human observation log, and selected image galleries are stored in
 - [x] Calibration and temperature scaling
 - [x] Paired bootstrap confidence intervals and McNemar comparison
 - [x] Qualitative failure-case analysis
-- [ ] Final research report and portfolio polish
+- [x] Final research report and portfolio polish
 
 ## Reproducibility notes
 
@@ -259,4 +270,10 @@ human observation log, and selected image galleries are stored in
 
 ## Citation
 
-If you use EuroSAT, cite the original dataset publication and official release. Dataset provenance and project decisions are recorded in `PROJECT_HANDOVER.md`.
+The dataset reference is Helber et al., “EuroSAT: A Novel Dataset and Deep
+Learning Benchmark for Land Use and Land Cover Classification,” *IEEE JSTARS*,
+2019, [doi:10.1109/JSTARS.2019.2918242](https://doi.org/10.1109/JSTARS.2019.2918242).
+The RGB archive used here is linked by
+[doi:10.5281/zenodo.7711097](https://doi.org/10.5281/zenodo.7711097).
+Dataset provenance and project decisions are recorded in
+[`PROJECT_HANDOVER.md`](PROJECT_HANDOVER.md).

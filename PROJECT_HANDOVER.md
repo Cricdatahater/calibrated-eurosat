@@ -1,6 +1,6 @@
 # Calibrated EuroSAT — Project Handover
 
-Last updated: 23 September 2026
+Last updated: 25 September 2026
 
 ## Objective
 
@@ -178,6 +178,7 @@ The NumPy version is deliberately pinned below 2 because the original Anaconda e
 
 ## Key artifacts
 
+- Final consolidated report: `FINAL_REPORT.md`
 - Notebooks:
   - `Notebooks/01_data_audit.ipynb`
   - `Notebooks/02_statistical_baseline.ipynb`
@@ -400,14 +401,31 @@ patches; they do not reveal a model's causal decision process and must not be
 used to relabel the data or tune a model on the test set. The image-level split
 still does not establish generalization to unseen geographic regions.
 
-## Planned later stages
+## Completed: Stage 8 — final report and portfolio documentation
 
-1. Final research report and portfolio presentation.
+The consolidated research narrative is `FINAL_REPORT.md`. It integrates the
+fixed protocol, three-model progression, paired comparison, calibration study,
+qualitative analysis, reproducibility record, references, and limitations. The
+README now serves as a shorter portfolio landing page and links to all seven
+notebooks and result directories.
+
+Final editorial checks confirmed that the report's metrics agree with the
+committed machine-readable artifacts, relative file and image links resolve,
+and no additional model selection was introduced after inspecting test results.
+The central limitation remains unchanged: the image-level split does not
+establish generalization to unseen geographic regions.
+
+## Project completion status
+
+
+The planned portfolio study is complete through data audit, statistical and CNN
+baselines, controlled fine-tuning, probability calibration, paired inference,
+qualitative failure analysis, and final reporting.
 
 ## Immediate next action
 
-Prepare the final research report and portfolio presentation. Consolidate the
-fixed experimental protocol, model progression, paired comparisons,
-calibration results, qualitative examples, reproducibility instructions, and
-geographic-generalization limitation. Perform editorial and artifact checks;
-do not introduce new model selection or tune against the locked test set.
+No experimental work is required for the current project scope. Perform a final
+Git review, commit the report and documentation, and create a tagged release if
+a stable portfolio snapshot is desired. Any geographic holdout, multispectral,
+or alternative-architecture study should be registered as a separate extension
+and must not reuse the locked test set for model selection.
